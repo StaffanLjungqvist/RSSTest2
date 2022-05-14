@@ -22,9 +22,15 @@ class MyAdapter(var articles: ArrayList<Article>) :
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val (title, desc, date, imageUrl1) = articles[position]
 //        val imageUrl = imageUrl1!!.replace("localhost", "10.0.2.2")
-        holder.titleTxt.setText(title)
-        holder.desctxt.setText(desc!!.substring(0, 130))
-        holder.dateTxt.setText(date)
+        if (title != null) holder.titleTxt.text = title
+
+        if (desc != null) holder.desctxt.text = desc
+
+        if (date != null) holder.dateTxt.setText(date)
+
+
+
+
      //   PicassoClient.downloadImage(c, imageUrl, holder.img)
     }
 

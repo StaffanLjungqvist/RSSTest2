@@ -4,18 +4,26 @@ package com.example.rsstest2
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rsstest2.model.Article
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.example.rsstest2.rss.Downloader
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 const val TAG = "mydebug"
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var model: MainViewModel
+    lateinit var adapter: MyAdapter
 
 
     val urlAddress = "https://smaforetagarna.se/nyheter/feed/"
@@ -24,19 +32,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toolbar: Toolbar = findViewById<View>(R.id.toolbar) as Toolbar
-      //  setSupportActionBar(toolbar)
-        val fab = findViewById<View>(R.id.fab) as FloatingActionButton
+        model = ViewModelProvider(this)[MainViewModel::class.java]
 
-        val rv = findViewById<View>(R.id.rv) as RecyclerView
-        rv.adapter = MyAdapter(ArrayList<Article>())
-        rv.layoutManager = LinearLayoutManager(this)
+        model.articles.observe(this, Observer{
+            adapter.articles = it
+            adapter.notifyDataSetChanged()
+        })
 
-        fab.setOnClickListener {
-                Log.d(TAG, "trycker på knappen")
-                Downloader(this@MainActivity, urlAddress, rv).execute()
+        setupRecyclerView()
 
+        model.getNews()
+
+        findViewById<Button>(R.id.fab).setOnClickListener {
+            model.getNews()
         }
+    }
+
+    fun setupRecyclerView() {
+        adapter = MyAdapter(ArrayList<Article>())
+        val rv = findViewById<View>(R.id.rv) as RecyclerView
+        rv.adapter = adapter
+        rv.layoutManager = LinearLayoutManager(this)
     }
 }
 
