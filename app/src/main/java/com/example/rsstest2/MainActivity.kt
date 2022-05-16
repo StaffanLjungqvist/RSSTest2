@@ -40,16 +40,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         setupRecyclerView()
-
         model.getNews()
-
-        findViewById<Button>(R.id.fab).setOnClickListener {
-            model.getNews()
-        }
     }
 
     fun setupRecyclerView() {
-        adapter = MyAdapter(ArrayList<Article>())
+        adapter = MyAdapter(this, ArrayList<Article>())
         val rv = findViewById<View>(R.id.rv) as RecyclerView
         rv.adapter = adapter
         rv.layoutManager = LinearLayoutManager(this)

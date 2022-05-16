@@ -3,35 +3,43 @@ package com.example.rsstest2
 
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.text.Html
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.rsstest2.model.Article
 
 
-class MyAdapter(var articles: ArrayList<Article>) :
+class MyAdapter(var context: Context, var articles: ArrayList<Article>) :
     RecyclerView.Adapter<MyViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val (title, desc, date, imageUrl1) = articles[position]
-//        val imageUrl = imageUrl1!!.replace("localhost", "10.0.2.2")
-        if (title != null) holder.titleTxt.text = title
+        val (title, desc, date, imageUrl1, content, link) = articles[position]
 
-        if (desc != null) holder.desctxt.text = desc
+        Glide.with(context)
+            .load(imageUrl1)
+            .into(holder.img)
 
-        if (date != null) holder.dateTxt.setText(date)
-
-
-
-
-     //   PicassoClient.downloadImage(c, imageUrl, holder.img)
+        holder.titleTxt.text = title
+        holder.desctxt.text = Html.fromHtml(desc as String?).toString()
+        holder.dateTxt.text = date
+        holder.btnLink.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+            startActivity(context, browserIntent, null)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -40,15 +48,11 @@ class MyAdapter(var articles: ArrayList<Article>) :
 }
 
 class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    var titleTxt: TextView
-    var desctxt: TextView
-    var dateTxt: TextView
-    var img: ImageView
 
-    init {
-        titleTxt = itemView.findViewById<View>(R.id.titleTxt) as TextView
-        desctxt = itemView.findViewById<View>(R.id.descTxt) as TextView
-        dateTxt = itemView.findViewById<View>(R.id.dateTxt) as TextView
-        img = itemView.findViewById<View>(R.id.articleImage) as ImageView
-    }
+        val titleTxt = itemView.findViewById<TextView>(R.id.titleTxt)
+        val desctxt = itemView.findViewById<TextView>(R.id.descTxt)
+        val dateTxt = itemView.findViewById<TextView>(R.id.dateTxt)
+        val img = itemView.findViewById<ImageView>(R.id.articleImage)
+        val btnLink = itemView.findViewById<Button>(R.id.btnLink)
+
 }

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">RSSTest2</string>
+    <string name="hej_hej">hej hej</string>
+    <string name="hej">hej</string>
 </resources>

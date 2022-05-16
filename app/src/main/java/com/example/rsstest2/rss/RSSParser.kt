@@ -34,9 +34,6 @@ class RSSParser(val inputStream: InputStream) {
             do {
                 val tagName = parser.name
                 when (event) {
-
-
-                    //Kollar om en <Tag> har ett visst värde. Om så är fallet så kollas även underkategorier
                     XmlPullParser.START_TAG -> if (tagName.equals("item", ignoreCase = true)) {
                         article = Article()
                         isSiteMeta = false
@@ -46,20 +43,18 @@ class RSSParser(val inputStream: InputStream) {
                         if (!isSiteMeta) {
                             if (tagName.equals("title", ignoreCase = true)) {
                                 article.title = tagValue
-                            } else if (tagName.equals("description", ignoreCase = true)) {
+                            } else if (tagName.equals("content:encoded", ignoreCase = true)) {
                                 val desc = tagValue
-                                article.description = desc!!.substring(desc.indexOf("/>") + 1)
-
-                                    //Todo - fixa så detta funkar
-                                val imageUrl = desc!!.substring(
-                                    desc.indexOf("thumbnail url=") + 5,
-                                    desc.indexOf("jpg") + 5
-                                )
-
-     //                           article.imageUrl = imageUrl
+                                article.description = desc!!.substring(desc.indexOf("/>") + 1, endIndex = desc.indexOf("<p class"))
                             } else if (tagName.equals("pubDate", ignoreCase = true)) {
                                 article.date = tagValue
-                            } 
+                            }
+                            else if (tagName.equals("media:thumbnail", ignoreCase = true)) {
+                                article.imageUrl = parser.getAttributeValue(0)
+                            }
+                            else if (tagName.equals("link", ignoreCase = true)) {
+                                article.link = tagValue
+                            }
                         }
                         if (tagName.equals("item", ignoreCase = true)) {
                             articles.add(article)
@@ -69,8 +64,7 @@ class RSSParser(val inputStream: InputStream) {
                 }
                 event = parser.next()
             } while (event != XmlPullParser.END_DOCUMENT)
-           Log.d(TAG, "Parse successful!")
-            Log.d(TAG, "number of articles = ${articles.size}")
+            Log.d(TAG, "Parse färdig, antal artiklar: ${articles.size}")
             return articles
         } catch (e: XmlPullParserException) {
             e.printStackTrace()
